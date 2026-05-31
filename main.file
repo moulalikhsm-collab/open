@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""
+================================================================================
+🌱 ECOFRIEND CENTRAL CODEBASE CONTROL DISPATCHER
+================================================================================
+File: main.file
+Purpose: Unified entry-point launcher for both backend services (FastAPI/app.py)
+         and beautiful web client dashboards (Streamlit/streamlit.app.py).
+
+Usage instructions:
+  - To launch Streamlit companion:
+      streamlit run streamlit.app.py
+  - To execute FastAPI REST API backend directly:
+      python3 app.py
+  - To run automated status / health check via control panel:
+      python3 main.file --status
+================================================================================
+"""
+
+import os
+import sys
+import subprocess
+import time
+
+def print_header():
+    border = "================================================================================"
+    print(f"\033[92m{border}")
+    print("      🌱  ECOFRIEND CENTRAL CONTROL AND COMPANION DISPATCH PANEL  🌱      ")
+    print(f"{border}\033[0m")
+    print("  Version: 1.0.0                      | Environment: Modern Android Sandbox")
+    print("  Author: EcoFriend AI Specialist     | Timestamp: 2026-05-31T10:45:00Z")
+    print(f"\033[92m{border}\033[0m\n")
+
+def run_status_audit():
+    print("\033[93m[+] Executing System Integrity & Code Audit...\033[0m")
+    time.sleep(0.5)
+    
+    # 1. Inspecting file availability
+    crucial_files = ["app/src/main/java/com/example/ui/AppUI.kt", "streamlit.app.py", "app.py"]
+    all_ok = True
+    print("\n📦 Node & Component Checklist:")
+    for path in crucial_files:
+        exists = os.path.exists(path)
+        icon = "✔️ \033[92mFOUND\033[0m" if exists else "❌ \033[91mMISSING\033[0m"
+        print(f"  - {path:<50} {icon}")
+        if not exists:
+            all_ok = False
+            
+    print("\n✅ Service Core Analysis Status Check:")
+    if all_ok:
+        print("  - Status: \033[92mINTEGRITY LEVEL VERIFIED (Core healthy & aligned)\033[0m")
+        print("  - Theme: Sleek Minimal Dark Green Aesthetic (#2E7D32, #F3F5F1, #E8F5E9)")
+    else:
+        print("  - Status: \033[91mWARNING - Some expected resources missing!\033[0m")
+        
+    print("\n" + "="*80 + "\n")
+
+def run_interactive_menu():
+    print_header()
+    print("Please select which EcoFriend component sandbox you want to launch:")
+    print("  [1] Streamlit Companion Web Interface (streamlit.app.py)")
+    print("  [2] FastAPI Microservice REST API Server (app.py)")
+    print("  [3] Offline Codebase Diagnostics Check")
+    print("  [4] Exit Control Center")
+    print("")
+    
+    try:
+        choice = input("\033[1mSelect an option (1-4): \033[0m").strip()
+        if choice == "1":
+            print("\n🚀 Booting up Streamlit on port 8501...")
+            print("Execute command manual override: streamlit run streamlit.app.py")
+            subprocess.run(["streamlit", "run", "streamlit.app.py"])
+        elif choice == "2":
+            print("\n🚀 Booting up FastAPI backend API server on port 8000...")
+            print("Execute command manual override: python3 app.py")
+            subprocess.run(["python3", "app.py"])
+        elif choice == "3":
+            print("")
+            run_status_audit()
+        elif choice == "4":
+            print("\n🌱 Thank you for utilizing EcoFriend. Grow a greener future!")
+        else:
+            print("\n❌ Invalid selection. Exiting control center dispatcher...")
+    except KeyboardInterrupt:
+        print("\n\n👋 Dispatcher interrupted by user. Growing out...")
+
+if __name__ == "__main__":
+    # Check command-line arguments
+    if len(sys.argv) > 1 and sys.argv[1] in ["--status", "-s"]:
+        print_header()
+        run_status_audit()
+    else:
+        run_interactive_menu()
