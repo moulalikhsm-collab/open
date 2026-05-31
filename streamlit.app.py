@@ -250,6 +250,37 @@ with st.sidebar:
     else:
         st.info("🔓 Browse in Simulation mode. Sign in inside Profile tab to sync Green Points.")
 
+    # Page Navigator
+    st.markdown("---")
+    st.markdown("<h3 style='margin-bottom:0.5rem; font-size:1.15rem; color:#2E7D32;'>📱 Page Selector</h3>", unsafe_allow_html=True)
+    
+    tabs_options = [
+        "🏠 Home Hub", 
+        "🎯 Smart Recommendations", 
+        "🔍 Leaf & Soil Diagnostic", 
+        "🤖 PrakritiMitra Chat", 
+        "📈 Water & Growth", 
+        "📚 Learning Hub",
+        "🌍 Community Grid",
+        "👤 Profile & Auth"
+    ]
+    
+    if "current_tab" not in st.session_state:
+        st.session_state.current_tab = "🏠 Home Hub"
+        
+    sidebar_select = st.radio(
+        "Active Section",
+        options=tabs_options,
+        index=tabs_options.index(st.session_state.current_tab),
+        key="navigation_radio_selector",
+        label_visibility="collapsed"
+    )
+    if sidebar_select != st.session_state.current_tab:
+        st.session_state.current_tab = sidebar_select
+        st.rerun()
+
+    st.markdown("---")
+
     # Real-Time Weather Intelligence Panel
     st.markdown("<h3 style='margin-bottom:0.5rem; font-size:1.15rem;'>🌦 Weather Intelligence</h3>", unsafe_allow_html=True)
     col_w1, col_w2 = st.columns(2)
@@ -290,8 +321,8 @@ with col_aux:
     </div>
     """, unsafe_allow_html=True)
 
-# Tabs definitions
-tab_h, tab_rec, tab_sc, tab_ch, tab_wt, tab_lh, tab_co, tab_pr = st.tabs([
+# State-driven interactive tab routing
+tabs_options = [
     "🏠 Home Hub", 
     "🎯 Smart Recommendations", 
     "🔍 Leaf & Soil Diagnostic", 
@@ -300,12 +331,17 @@ tab_h, tab_rec, tab_sc, tab_ch, tab_wt, tab_lh, tab_co, tab_pr = st.tabs([
     "📚 Learning Hub",
     "🌍 Community Grid",
     "👤 Profile & Auth"
-])
+]
+
+if "current_tab" not in st.session_state:
+    st.session_state.current_tab = "🏠 Home Hub"
+
+active_tab = st.session_state.current_tab
 
 # ==========================================
 # TAB 1: HOME HUB
 # ==========================================
-with tab_h:
+if active_tab == "🏠 Home Hub":
     st.markdown("""
     <div class="accent-header-card">
         <span class="badge">SEASONAL TOP SELECTION</span>
@@ -386,7 +422,7 @@ with tab_h:
 # ==========================================
 # TAB 2: SMART RECOMMENDATIONS
 # ==========================================
-with tab_rec:
+if active_tab == "🎯 Smart Recommendations":
     st.subheader("🎯 Intelligent Agricultural & Nursery Recommender")
     st.write("Generate location-aware planting guidelines tailored around water volume constraints, ground space, and targets.")
     
@@ -478,7 +514,7 @@ with tab_rec:
 # ==========================================
 # TAB 3: LEAF & SOIL DIAGNOSTIC
 # ==========================================
-with tab_sc:
+if active_tab == "🔍 Leaf & Soil Diagnostic":
     st.subheader("🔍 AI Leaf Disease Pathogen & Substrate Soil Decoder")
     st.write("Assess leaf infections or decode chemical substrate textures. Multi-tiered computer vision modeling.")
     
@@ -598,7 +634,7 @@ with tab_sc:
 # ==========================================
 # TAB 4: PRAKRITIMITRA COMPANION CHAT
 # ==========================================
-with tab_ch:
+if active_tab == "🤖 PrakritiMitra Chat":
     st.markdown("""
     <div style="background-color:#E8F5E9; padding:1.25rem; border-radius:18px; border:1px solid #C8E6C9; margin-bottom:1rem;">
         <h3 style="color:#2E7D32; margin:0 0 0.25rem 0;">🤖 PrakritiMitra Chat Screen</h3>
@@ -696,7 +732,7 @@ with tab_ch:
 # ==========================================
 # TAB 5: WATER & GROWTH
 # ==========================================
-with tab_wt:
+if active_tab == "📈 Water & Growth":
     st.subheader("💧 Smart Irrigation & Growth Simulation Modeler")
     st.write("Calculate precision water needs or forecast crop growth height, yield, and blossom calendars with custom telemetry inputs.")
     
@@ -765,7 +801,7 @@ with tab_wt:
 # ==========================================
 # TAB 6: ECO LEARNING HUB
 # ==========================================
-with tab_lh:
+if active_tab == "📚 Learning Hub":
     st.subheader("📚 Eco-Learning Hub & Botanical Encyclopedia")
     st.write("Browse detailed organic cultivation schedules and plant databases.")
     
@@ -816,7 +852,7 @@ with tab_lh:
 # ==========================================
 # TAB 7: COMMUNITY GRID
 # ==========================================
-with tab_co:
+if active_tab == "🌍 Community Grid":
     st.subheader("🌍 EcoFriend Active Community Board")
     st.write("Engage with organic gardeners around your city. Showcase green milestones and take active environmental pledges.")
     
@@ -873,7 +909,7 @@ with tab_co:
 # ==========================================
 # TAB 8: PROFILE & AUTHENTICATION
 # ==========================================
-with tab_pr:
+if active_tab == "👤 Profile & Auth":
     st.subheader("👤 EcoFriend Profile & Simulated Authentication")
     st.write("Manage active login profiles, inspect saved plant species, and unlock eco achievements.")
     
@@ -952,3 +988,47 @@ with tab_pr:
             </div>
             """, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
+
+# ==============================================================================
+# PREMIUM LOWER NAVIGATION SYSTEM DOCK
+# ==============================================================================
+st.markdown("<p style='margin-top: 4rem;'></p>", unsafe_allow_html=True)  # Add generous spacing before bottom bar
+st.markdown("---")
+
+st.markdown("""
+<div style="background-color: #EBF8FF; padding: 1rem; border-radius: 14px; border: 1px solid #BEE3F8; margin-bottom:1.5rem; text-align: center;">
+    <h3 style="margin: 0; color: #2B6CB0 !important; font-size: 1.15rem;">📱 EcoFriend Bottom Navigation Dock</h3>
+    <p style="margin: 0; font-size: 0.8rem; color: #4A5568;">Click a tab below to jump directly to any active screen</p>
+</div>
+""", unsafe_allow_html=True)
+
+nav_cols = st.columns(8)
+nav_icons = {
+    "🏠 Home Hub": "🏠 Home",
+    "🎯 Smart Recommendations": "🎯 Recs",
+    "🔍 Leaf & Soil Diagnostic": "🔍 Scan",
+    "🤖 PrakritiMitra Chat": "🤖 Chat",
+    "📈 Water & Growth": "📈 Growth",
+    "📚 Learning Hub": "📚 Learn",
+    "🌍 Community Grid": "🌍 Social",
+    "👤 Profile & Auth": "👤 Profile"
+}
+
+for idx, tab_name in enumerate(tabs_options):
+    with nav_cols[idx]:
+        is_active = (active_tab == tab_name)
+        short_name = nav_icons[tab_name]
+        
+        # Streamlit button that triggers state synchronized navigation
+        if is_active:
+            st.markdown(f"""
+            <div style="text-align: center; border-bottom: 3px solid #2E7D32; padding-bottom: 2px;">
+                <p style="margin: 0; font-size: 0.8rem; font-weight: bold; color: #2E7D32;">{short_name.split()[0]}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            st.button(short_name, key=f"bottom_active_btn_{idx}", use_container_width=True, disabled=True)
+        else:
+            if st.button(short_name, key=f"bottom_nav_btn_{idx}", use_container_width=True):
+                st.session_state.current_tab = tab_name
+                st.session_state.navigation_radio_selector = tab_name
+                st.rerun()
