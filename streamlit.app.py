@@ -262,6 +262,7 @@ with st.sidebar:
         "📈 Water & Growth", 
         "📚 Learning Hub",
         "🌍 Community Grid",
+        "🔄 Flow & Architecture",
         "👤 Profile & Auth"
     ]
     
@@ -330,6 +331,7 @@ tabs_options = [
     "📈 Water & Growth", 
     "📚 Learning Hub",
     "🌍 Community Grid",
+    "🔄 Flow & Architecture",
     "👤 Profile & Auth"
 ]
 
@@ -907,6 +909,200 @@ if active_tab == "🌍 Community Grid":
                 st.rerun()
 
 # ==========================================
+# TAB 7.5: WORKFLOW & DEEP ARCHITECTURE FLOW
+# ==========================================
+if active_tab == "🔄 Flow & Architecture":
+    st.subheader("🔄 Interactive System Architecture & Application Workflows")
+    st.write("Examine the visual pathways, backend pipelines, predictive AI models, and real-time state machines powering the EcoFriend engine.")
+    
+    # SYSTEM OVERVIEW ARCHITECTURE DIAGRAM (HTML/CSS representation)
+    st.markdown("""
+    <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+        <h4 style="color: #0F172A; margin: 0 0 1rem 0; font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🧱</span> Overall System Architecture Flow
+        </h4>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; font-family: monospace; font-size: 0.9rem;">
+            <div style="background-color: #E2E8F0; border-left: 5px solid #22C55E; padding: 0.5rem 1rem; border-radius: 6px; width: 80%; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <b style="color: #1E293B;">🖥️ Streamlit Frontend</b><br>
+                <span style="font-size: 0.75rem; color: #64748B;">Receives User inputs, image uploads, chat queries, and slider triggers</span>
+            </div>
+            <div style="color: #22C55E; font-weight: bold; font-size: 1.2rem;">⬇️</div>
+            <div style="background-color: #D1FAE5; border-left: 5px solid #10B981; padding: 0.5rem 1rem; border-radius: 6px; width: 80%; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <b style="color: #065F46;">⚙️ Python Backend Engine & API Gateways</b><br>
+                <span style="font-size: 0.75rem; color: #047857;">State handlers, session tokens, precision matrix algorithms, weather routing</span>
+            </div>
+            <div style="color: #10B981; font-weight: bold; font-size: 1.2rem;">⬇️</div>
+            <div style="background-color: #DBEAFE; border-left: 5px solid #3B82F6; padding: 0.5rem 1rem; border-radius: 6px; width: 80%; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <b style="color: #1E3A8A;">🧠 AI Models & Predictions (Gemini / CV CNN / LLM)</b><br>
+                <span style="font-size: 0.75rem; color: #1D4ED8;">Feature extraction, leaf classification, intent mapping, growth timeline forecasts</span>
+            </div>
+            <div style="color: #3B82F6; font-weight: bold; font-size: 1.2rem;">⬇️</div>
+            <div style="background-color: #FEF3C7; border-left: 5px solid #F59E0B; padding: 0.5rem 1rem; border-radius: 6px; width: 80%; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <b style="color: #78350F;">💾 Database & Persistence (SQLite / State Handlers)</b><br>
+                <span style="font-size: 0.75rem; color: #D97706;">Saves regional plant lists, active community logs, gamified environmental points</span>
+            </div>
+            <div style="color: #F59E0B; font-weight: bold; font-size: 1.2rem;">⬇️</div>
+            <div style="background-color: #F0FDF4; border-left: 5px solid #15803D; padding: 0.5rem 1rem; border-radius: 6px; width: 80%; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <b style="color: #166534;">📊 Output UI Presentation Layer</b><br>
+                <span style="font-size: 0.75rem; color: #15803D;">Dynamic dashboard updates, live maps, confidence heatmaps, diagnostic results</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_wflow1, col_wflow2 = st.columns([1.2, 1])
+    
+    with col_wflow1:
+        st.markdown("<div class='premium-card'>", unsafe_allow_html=True)
+        st.markdown("#### 🚀 Interactive Workflow Selector")
+        st.write("Choose any of the core functional workflows below to highlight its journey steps and simulate its execution live!")
+        
+        flow_choice = st.selectbox("Select Application Flow to Inspect", [
+            "🔐 Authentication Flow (Login/Signup)",
+            "🏠 Home Dashboard Navigation Flow",
+            "🌿 Plant Recommendation Process Flow",
+            "📷 Leaf Scan (Disease Detection & Classification)",
+            "🤖 PrakritiMitra Chatbot Query Path",
+            "📈 Growth Prediction Model Journey",
+            "🌦 Weather Integration & Live Sync Flow",
+            "🌍 Community Grid Social & Storage System",
+            "🏆 Gamification & Points Accruing Loop",
+            "👤 Profile Maintenance & Logs Flow"
+        ])
+        
+        st.markdown("<hr style='margin:1rem 0;'>", unsafe_allow_html=True)
+        
+        # Display Flow Details based on selection
+        if flow_choice == "🔐 Authentication Flow (Login/Signup)":
+            st.markdown("""
+            ##### 🔐 Workflow Details: Authentication
+            - **Step 1:** User accesses sign-in portal choosing *Email/Password login*, *Google One-Tap SSO*, or *OTP Cellular confirmation*.
+            - **Step 2:** Submission prompts secure cryptographic handshake.
+            - **Step 3:** System creates or maps a structured, active session state (`st.session_state`).
+            - **Step 4:** Corresponding user metadata (username, custom region, accumulated EcoPoints) are loaded globally.
+            """)
+        elif flow_choice == "🏠 Home Dashboard Navigation Flow":
+            st.markdown("""
+            ##### 🏠 Workflow Details: Home Dashboard
+            - **Step 1:** Successful authentication unlocks global dashboard views.
+            - **Step 2:** Home Hub fetches local cache parameters (dynamic weather, default tulsi score).
+            - **Step 3:** Displays unified widgets: *Weather updates*, *Climate recommendations*, *Eco Tips of the day*, and *Dynamic progress bars*.
+            - **Step 4:** Exposes fast redirection shortcuts directing back to scanning or chat engines.
+            """)
+        elif flow_choice == "🌿 Plant Recommendation Process Flow":
+            st.markdown("""
+            ##### 🌿 Workflow Details: Plant Recommendation
+            - **Step 1:** User inputs location attributes, optional soil classification, and plantation goal (shade, yield, or health).
+            - **Step 2:** Python recommendation engines query the local horticultural database.
+            - **Step 3:** Compares climate specifications (temperature tolerances, humidity margins) matching candidate varieties.
+            - **Step 4:** Returns sorted, optimal recommendations backed by precise care parameters and specific watering metrics.
+            """)
+        elif flow_choice == "📷 Leaf Scan (Disease Detection & Classification)":
+            st.markdown("""
+            ##### 📷 Workflow Details: Leaf Scanner CNN
+            - **Step 1:** User snaps or uploads a leaf picture.
+            - **Step 2:** Byte-stream is passed down to classification nodes (neural network representation).
+            - **Step 3:** Feature extraction calculates pathological signals matching known rusts, molds, or deficiencies.
+            - **Step 4:** Outputs diagnostic names, confidence scores, hazard levels (Severity), and organic remedies.
+            """)
+        elif flow_choice == "🤖 PrakritiMitra Chatbot Query Path":
+            st.markdown("""
+            ##### 🤖 Workflow Details: PrakritiMitra LLM
+            - **Step 1:** User submits a textual query or spoken question.
+            - **Step 2:** Input is routed to semantic intent classifier hooks.
+            - **Step 3:** High confidence agricultural/botany requests route through deep botanical systems; general chat routes to base friendly tone engines.
+            - **Step 4:** Renders formatted solutions directly with conversational context streaming.
+            """)
+        elif flow_choice == "📈 Growth Prediction Model Journey":
+            st.markdown("""
+            ##### 📈 Workflow Details: Growth Predictor
+            - **Step 1:** User selects target plant variety from local inventory.
+            - **Step 2:** Fetches historical species development data combined with ambient weather trends.
+            - **Step 3:** Simulates potential growth vectors over a flexible temporal index.
+            - **Step 4:** Displays an interactive chart illustrating expected height trajectories, blossoming milestones, and yield estimates.
+            """)
+        elif flow_choice == "🌦 Weather Integration & Live Sync Flow":
+            st.markdown("""
+            ##### 🌦 Workflow Details: Weather Engine
+            - **Step 1:** System periodically triggers background asynchronous weather requests.
+            - **Step 2:** Fetches real-time temperature, absolute humidity, and local ambient precipitation possibilities.
+            - **Step 3:** Automatically updates agricultural metrics and microclimate matchmaking states.
+            - **Step 4:** Adapts dynamic alert banners when extreme conditions are sensed.
+            """)
+        elif flow_choice == "🌍 Community Grid Social & Storage System":
+            st.markdown("""
+            ##### 🌍 Workflow Details: Community Grid
+            - **Step 1:** Active user joins neighborhood challenges or composes an organic gardening milestone update.
+            - **Step 2:** Image streams or text narratives list inside synchronized application memory databases.
+            - **Step 3:** Content immediately updates on the live community blackboard feed available to all adjacent profiles.
+            - **Step 4:** Enables interaction events (such as upvotes and shares) updating author metadata.
+            """)
+        elif flow_choice == "🏆 Gamification & Points Accruing Loop":
+            st.markdown("""
+            ##### 🏆 Workflow Details: Gamification and Badges
+            - **Step 1:** Monitors discrete sustainable actions (daily logs, diagnostics completed, organic pledges checked).
+            - **Step 2:** Increments absolute profile EcoPoints (Green Points) with corresponding state toast notices.
+            - **Step 3:** Compares current scores against dynamic experience margins.
+            - **Step 4:** Automatically registers verified digital certificates, lock achievements, and ranks.
+            """)
+        elif flow_choice == "👤 Profile Maintenance & Logs Flow":
+            st.markdown("""
+            ##### 👤 Workflow Details: Profile Dashboard
+            - **Step 1:** Loads centralized session values mapping onto the personal data container.
+            - **Step 2:** Renders registered plant inventories, ongoing daily calendars, and analytics.
+            - **Step 3:** Displays unlocked digital badges confirming sustainability actions.
+            - **Step 4:** Enables local sandbox logout or authentication resetting commands.
+            """)
+            
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+    with col_wflow2:
+        st.markdown("<div class='premium-card' style='background-color: #F8FAFC; border:1px solid #CBD5E1;'>", unsafe_allow_html=True)
+        st.markdown("#### ⚡ Real-Time Pipeline Simulator")
+        st.write("Run the automated mock sequence of the selected pipeline to watch input data translate into output displays in real time!")
+        
+        sim_speed = st.slider("Simulation Animation Step-Delay (Seconds)", 0.2, 2.0, 0.8)
+        
+        run_sim = st.button("▶️ Execute Selected Pipeline Workflow", use_container_width=True)
+        
+        st.write("")
+        st.markdown("<div style='background-color:#0F172A; color:#38BDF8; font-family: monospace; padding:1.25rem; border-radius:10px; font-size:0.85rem; border:1px solid #334155; min-height: 250px;'>", unsafe_allow_html=True)
+        st.markdown("<span style='color: #64748B;'># -- eco-pipeline terminal initialized --</span>", unsafe_allow_html=True)
+        st.markdown("<span style='color: #64748B;'># Waiting for user trigger...</span>", unsafe_allow_html=True)
+        
+        if run_sim:
+            with st.spinner("Initializing sandbox telemetry pipeline..."):
+                time.sleep(sim_speed * 0.5)
+            
+            # Step 1: User Input
+            st.markdown("<p style='color: #34D399; margin: 0;'><b>📥 STEP 1: USER INPUT Sensed</b></p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='color: #E2E8F0; margin: 0 0 0.5rem 0;'>&gt;&gt; Captured target parameters for pipeline: [<b>{flow_choice.split()[1]}</b>]</p>", unsafe_allow_html=True)
+            time.sleep(sim_speed)
+            
+            # Step 2: AI Processing & Inference
+            st.markdown("<p style='color: #60A5FA; margin: 0;'><b>🧠 STEP 2: BACKEND AI PROCESSING</b></p>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #E2E8F0; margin: 0 0 0.5rem 0;'>&gt;&gt; Triggering feature extraction & model inference nodes...</p>", unsafe_allow_html=True)
+            time.sleep(sim_speed)
+            
+            # Step 3: Database Storage or Retrieval
+            st.markdown("<p style='color: #FBBF24; margin: 0;'><b>💾 STEP 3: DATABASE / MODEL HANDSHAKE</b></p>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #E2E8F0; margin: 0 0 0.5rem 0;'>&gt;&gt; Validating security keys & state values. Persisting records...</p>", unsafe_allow_html=True)
+            time.sleep(sim_speed)
+            
+            # Step 4: Display Output
+            st.markdown("<p style='color: #F472B6; margin: 0;'><b>📺 STEP 4: RESULT DISPLAY UPDATED</b></p>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #E2E8F0; margin: 0 0 0.5rem 0;'>&gt;&gt; Recompiled views & dynamic responsive graphs successfully.</p>", unsafe_allow_html=True)
+            time.sleep(sim_speed)
+            
+            # Step 5: User Action complete
+            st.markdown("<p style='color: #A78BFA; margin: 0;'><b>🎯 STEP 5: COMPLETED USER JOURNEY</b></p>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #34D399; margin: 0;'>&gt;&gt; <b>Pipeline Status: SUCCESS (200 OK)</b> 🎉</p>", unsafe_allow_html=True)
+            st.toast("Workflow execution simulation complete! 🌱", icon="✔️")
+            
+        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# ==========================================
 # TAB 8: PROFILE & AUTHENTICATION
 # ==========================================
 if active_tab == "👤 Profile & Auth":
@@ -1002,7 +1198,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-nav_cols = st.columns(8)
+nav_cols = st.columns(9)
 nav_icons = {
     "🏠 Home Hub": "🏠 Home",
     "🎯 Smart Recommendations": "🎯 Recs",
@@ -1011,6 +1207,7 @@ nav_icons = {
     "📈 Water & Growth": "📈 Growth",
     "📚 Learning Hub": "📚 Learn",
     "🌍 Community Grid": "🌍 Social",
+    "🔄 Flow & Architecture": "🔄 Flow",
     "👤 Profile & Auth": "👤 Profile"
 }
 
