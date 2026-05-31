@@ -22,13 +22,68 @@ st.markdown("""
         background-color: #F3F5F1;
         color: #1E293B;
     }
-    h1, h2, h3, h4 {
+    h1, h2, h3, h4, h5, h6 {
         font-family: 'Playfair Display', 'Georgia', serif !important;
         color: #1E293B !important;
         font-weight: 800;
     }
-    p, span, label, div, li {
+    /* Force high visibility of text/labels on the light background to combat dark system themes */
+    p, span, label, li, caption, small {
         font-family: 'Inter', 'Segoe UI', sans-serif;
+        color: #1E293B !important;
+    }
+    [data-testid="stWidgetLabel"] p, 
+    [data-testid="stMarkdownContainer"] p, 
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] span {
+        color: #1E293B !important;
+    }
+    
+    /* Ensure the accented header card with dark green background maintains high-contrast white text */
+    .accent-header-card, 
+    .accent-header-card p, 
+    .accent-header-card span, 
+    .accent-header-card h1, 
+    .accent-header-card h2, 
+    .accent-header-card h3, 
+    .accent-header-card h4 {
+        color: #FFFFFF !important;
+    }
+
+    /* Specialized dynamic styling for the pipeline command simulator terminal */
+    .eco-terminal, .eco-terminal p, .eco-terminal span, .eco-terminal b {
+        font-family: 'Courier New', Courier, monospace !important;
+    }
+    .eco-terminal .term-comment {
+        color: #A3E635 !important;
+        font-weight: bold;
+    }
+    .eco-terminal .term-waiting {
+        color: #38BDF8 !important;
+        font-weight: bold;
+    }
+    .eco-terminal .term-step1 {
+        color: #34D399 !important;
+        font-weight: bold;
+    }
+    .eco-terminal .term-step2 {
+        color: #60A5FA !important;
+        font-weight: bold;
+    }
+    .eco-terminal .term-step3 {
+        color: #FBBF24 !important;
+        font-weight: bold;
+    }
+    .eco-terminal .term-step4 {
+        color: #F472B6 !important;
+        font-weight: bold;
+    }
+    .eco-terminal .term-step5 {
+        color: #A78BFA !important;
+        font-weight: bold;
+    }
+    .eco-terminal .term-text {
+        color: #E2E8F0 !important;
     }
     
     /* Elegant Custom Card Containers */
@@ -1066,37 +1121,37 @@ if active_tab == "🔄 Flow & Architecture":
         run_sim = st.button("▶️ Execute Selected Pipeline Workflow", use_container_width=True)
         
         st.write("")
-        st.markdown("<div style='background-color:#0F172A; color:#38BDF8; font-family: monospace; padding:1.25rem; border-radius:10px; font-size:0.85rem; border:1px solid #334155; min-height: 250px;'>", unsafe_allow_html=True)
-        st.markdown("<span style='color: #64748B;'># -- eco-pipeline terminal initialized --</span>", unsafe_allow_html=True)
-        st.markdown("<span style='color: #64748B;'># Waiting for user trigger...</span>", unsafe_allow_html=True)
+        st.markdown("<div class='eco-terminal' style='background-color:#0F172A; padding:1.25rem; border-radius:10px; font-size:0.85rem; border:1px solid #334155; min-height: 250px;'>", unsafe_allow_html=True)
+        st.markdown("<span class='term-comment'># -- eco-pipeline terminal initialized --</span>", unsafe_allow_html=True)
+        st.markdown("<span class='term-waiting'># Waiting for user trigger...</span>", unsafe_allow_html=True)
         
         if run_sim:
             with st.spinner("Initializing sandbox telemetry pipeline..."):
                 time.sleep(sim_speed * 0.5)
             
             # Step 1: User Input
-            st.markdown("<p style='color: #34D399; margin: 0;'><b>📥 STEP 1: USER INPUT Sensed</b></p>", unsafe_allow_html=True)
-            st.markdown(f"<p style='color: #E2E8F0; margin: 0 0 0.5rem 0;'>&gt;&gt; Captured target parameters for pipeline: [<b>{flow_choice.split()[1]}</b>]</p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-step1'><b>📥 STEP 1: USER INPUT Sensed</b></p>", unsafe_allow_html=True)
+            st.markdown(f"<p class='term-text'>&gt;&gt; Captured target parameters for pipeline: [<b>{flow_choice.split()[1]}</b>]</p>", unsafe_allow_html=True)
             time.sleep(sim_speed)
             
             # Step 2: AI Processing & Inference
-            st.markdown("<p style='color: #60A5FA; margin: 0;'><b>🧠 STEP 2: BACKEND AI PROCESSING</b></p>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #E2E8F0; margin: 0 0 0.5rem 0;'>&gt;&gt; Triggering feature extraction & model inference nodes...</p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-step2'><b>🧠 STEP 2: BACKEND AI PROCESSING</b></p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-text'>&gt;&gt; Triggering feature extraction & model inference nodes...</p>", unsafe_allow_html=True)
             time.sleep(sim_speed)
             
             # Step 3: Database Storage or Retrieval
-            st.markdown("<p style='color: #FBBF24; margin: 0;'><b>💾 STEP 3: DATABASE / MODEL HANDSHAKE</b></p>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #E2E8F0; margin: 0 0 0.5rem 0;'>&gt;&gt; Validating security keys & state values. Persisting records...</p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-step3'><b>💾 STEP 3: DATABASE / MODEL HANDSHAKE</b></p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-text'>&gt;&gt; Validating security keys & state values. Persisting records...</p>", unsafe_allow_html=True)
             time.sleep(sim_speed)
             
             # Step 4: Display Output
-            st.markdown("<p style='color: #F472B6; margin: 0;'><b>📺 STEP 4: RESULT DISPLAY UPDATED</b></p>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #E2E8F0; margin: 0 0 0.5rem 0;'>&gt;&gt; Recompiled views & dynamic responsive graphs successfully.</p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-step4'><b>📺 STEP 4: RESULT DISPLAY UPDATED</b></p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-text'>&gt;&gt; Recompiled views & dynamic responsive graphs successfully.</p>", unsafe_allow_html=True)
             time.sleep(sim_speed)
             
             # Step 5: User Action complete
-            st.markdown("<p style='color: #A78BFA; margin: 0;'><b>🎯 STEP 5: COMPLETED USER JOURNEY</b></p>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #34D399; margin: 0;'>&gt;&gt; <b>Pipeline Status: SUCCESS (200 OK)</b> 🎉</p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-step5'><b>🎯 STEP 5: COMPLETED USER JOURNEY</b></p>", unsafe_allow_html=True)
+            st.markdown("<p class='term-step1'>&gt;&gt; <b>Pipeline Status: SUCCESS (200 OK)</b> 🎉</p>", unsafe_allow_html=True)
             st.toast("Workflow execution simulation complete! 🌱", icon="✔️")
             
         st.markdown("</div>", unsafe_allow_html=True)
