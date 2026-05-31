@@ -94,7 +94,7 @@ st.markdown("""
 # STATE & DATA INITIALIZATION
 # ==============================================================================
 if "auth_logged_in" not in st.session_state:
-    st.session_state.auth_logged_in = True  # Start auto-authenticated for fluid experience
+    st.session_state.auth_logged_in = False  # Default to premium auth gate
 if "auth_user_name" not in st.session_state:
     st.session_state.auth_user_name = "Arjun Patel"
 if "green_points" not in st.session_state:
@@ -121,6 +121,115 @@ ECO_TIPS = [
     "☀️ Companion planting secret: Plant basil right next to tomato shrubs. It naturally repels whiteflies and mosquitoes while elevating plant yields!",
     "♻️ Boil banana peels in plain water for 24 hours to formulate an organic, potassium-dense liquid shot perfect for hibiscus, roses, and flowering shrubs."
 ]
+
+# ==============================================================================
+# PREMIUM AUTHENTICATION GATE SCREEN
+# ==============================================================================
+if not st.session_state.auth_logged_in:
+    st.markdown("""
+    <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+        <span style="font-size: 3.5rem;">🌱</span>
+        <h1 style="margin-top: 0.5rem; color: #2E7D32;">EcoFriend Portal</h1>
+        <p style="color: #64748B; font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.5;">
+            Join a digital green community dedicated to environmental sustainability. Compute smart crop advice, diagnose pathogens, and converse with PrakritiMitra AI companion.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col_auth_left, col_auth_mid, col_auth_right = st.columns([1, 2.0, 1])
+    
+    with col_auth_mid:
+        st.markdown("<div class='premium-card' style='background-color:#FFFFFF; border:1px solid #D1FAE5;'>", unsafe_allow_html=True)
+        auth_choice = st.selectbox("Select Access Portal Method", [
+            "🔑 Email Sign-In", 
+            "📝 Account Registration", 
+            "💬 OTP Mobile Code Access", 
+            "🩹 Password Self-Recovery"
+        ])
+        
+        st.markdown("<hr style='margin-top:0.5rem; margin-bottom:1.5rem; border:0; border-top:1px solid #E5E7EB;'>", unsafe_allow_html=True)
+        
+        if auth_choice == "🔑 Email Sign-In":
+            st.markdown("<h3 style='font-size:1.25rem; font-weight:700; color:#1F2937; margin-bottom:1rem;'>Sign In Credentials</h3>", unsafe_allow_html=True)
+            log_email = st.text_input("Registered Email Address", "arjun.patel@ecofriend.org", key="gate_log_email")
+            log_pass = st.text_input("Security Password", "••••••••", type="password", key="gate_log_pass")
+            
+            col_lg1, col_lg2 = st.columns([1.5, 1])
+            with col_lg1:
+                if st.button("Unlock Sandbox Panel 🚪", use_container_width=True):
+                    with st.spinner("Authorizing cryptographic token handshake..."):
+                        time.sleep(1.0)
+                    st.session_state.auth_logged_in = True
+                    st.session_state.auth_user_name = log_email.split("@")[0].capitalize()
+                    st.toast(f"Welcome back, {st.session_state.auth_user_name}! 🌱", icon="🌿")
+                    st.rerun()
+            with col_lg2:
+                if st.button("🔓 Guest Mirror", use_container_width=True):
+                    st.session_state.auth_logged_in = True
+                    st.session_state.auth_user_name = "Guest Guardian"
+                    st.toast("Entered simulation as Guest", icon="🔓")
+                    st.rerun()
+            
+            st.markdown("<div style='text-align:center; color:#9CA3AF; margin:1.25rem 0; font-size:0.75rem; letter-spacing:0.05em; font-weight:bold;'>OR SOCIAL SIGN-ON</div>", unsafe_allow_html=True)
+            if st.button("🟢  Instant Log In with Google SSO", use_container_width=True):
+                with st.spinner("Connecting to Google Identity API..."):
+                    time.sleep(1.1)
+                st.session_state.auth_logged_in = True
+                st.session_state.auth_user_name = "Arjun Patel"
+                st.toast("Google SSO Sign-In complete!", icon="✔️")
+                st.rerun()
+                
+        elif auth_choice == "📝 Account Registration":
+            st.markdown("<h3 style='font-size:1.25rem; font-weight:700; color:#1F2937; margin-bottom:1rem;'>Create New Eco Profile</h3>", unsafe_allow_html=True)
+            reg_user = st.text_input("Display Name / Persona", "Arjun Patel", key="gate_reg_user")
+            reg_email = st.text_input("Your Active Email Address", "arjun.patel@ecofriend.org", key="gate_reg_email")
+            reg_pass = st.text_input("Security Key / Password", "••••••••", type="password", key="gate_reg_pass")
+            reg_coords = st.selectbox("Preferred Micro-climate Zone Coordinates", ["Hyderabad Hub (IN)", "Delhi Northern Plains (IN)", "Mumbai Coastal Zone (IN)", "Bengaluru Plateau (IN)"])
+            
+            if st.button("Register & Get +500 Welcome GP 🏆", use_container_width=True):
+                with st.spinner("Registering securely on centralized database..."):
+                    time.sleep(1.2)
+                st.session_state.auth_logged_in = True
+                st.session_state.auth_user_name = reg_user
+                st.session_state.green_points = 500  # Starting validation bonus!
+                st.toast(f"Account Ready, {reg_user}! +500 GP added.", icon="🎉")
+                st.rerun()
+                
+        elif auth_choice == "💬 OTP Mobile Code Access":
+            st.markdown("<h3 style='font-size:1.25rem; font-weight:700; color:#1F2937; margin-bottom:1rem;'>SMS OTP Access</h3>", unsafe_allow_html=True)
+            reg_phone = st.text_input("Phone Number Country Prefix", "+91 98765 43210", key="gate_reg_phone")
+            
+            col_otp1, col_otp2 = st.columns([1.6, 1])
+            with col_otp1:
+                input_otp = st.text_input("6-digit cellular OTP", "123456", key="gate_input_otp")
+            with col_otp2:
+                st.write("")
+                st.write("")
+                if st.button("Request Code"):
+                    st.toast("SMS Verification Code Sent to Phone simulator!", icon="📲")
+            
+            if st.button("Verify Credentials 📲", use_container_width=True):
+                with st.spinner("Verifying matching OTP code..."):
+                    time.sleep(0.8)
+                st.session_state.auth_logged_in = True
+                st.session_state.auth_user_name = "SMS Guardian"
+                st.toast("Verification Code Matched! Logged in.", icon="✔️")
+                st.rerun()
+                
+        elif auth_choice == "🩹 Password Self-Recovery":
+            st.markdown("<h3 style='font-size:1.25rem; font-weight:700; color:#1F2937; margin-bottom:1rem;'>Dispatch Recovery Email</h3>", unsafe_allow_html=True)
+            st.write("Forgot your keys? Enter your registered email address beneath to fetch an automated credentials recovery magic link.")
+            recover_email = st.text_input("Profile Email Address", "arjun.patel@ecofriend.org", key="gate_recover_email")
+            
+            if st.button("Send Automated Recovery Email ✉️", use_container_width=True):
+                with st.spinner("Dispatching secure validation token..."):
+                    time.sleep(1.0)
+                st.success(f"✉️ Password reset token has been successfully generated and sent to: {recover_email}")
+                
+        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align:center; font-size:0.8rem; color:#9CA3AF;'>Protected by EcoFriend secure cryptographic sandbox standard</p>", unsafe_allow_html=True)
+        
+    st.stop()  # Stop streamlit code sequence flow if not authenticated yet!
 
 # ==============================================================================
 # SIDEBAR NAVIGATION & AMBIENT WIDGETS
