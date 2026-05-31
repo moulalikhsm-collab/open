@@ -3,6 +3,54 @@ import random
 import time
 import pandas as pd
 import numpy as np
+import os
+import requests
+import json
+
+def call_gemini_api(prompt, chat_mode, selected_lang):
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or api_key == "MY_GEMINI_API_KEY":
+        return None
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    
+    system_inst = (
+        f"You are PrakritiMitra, a kind, helpful, nature-loving AI companion and general assistant in the EcoFriend app. "
+        f"Currently, your intelligence profile is set to: {chat_mode}. "
+        f"The user prefers reading and writing in: {selected_lang}. "
+        f"Please answer their question beautifully. If they ask about botany, plants, soil, or gardening, "
+        f"integrate relevant details. If they ask about anything else, answer gracefully as a general AI assistant. "
+        f"Since the user preference is set, you MUST write your response in {selected_lang}."
+    )
+    
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": f"{system_inst}\n\nUser Question: {prompt}"
+                    }
+                ]
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.7,
+            "maxOutputTokens": 1000
+        }
+    }
+    
+    headers = {
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=12)
+        if response.status_code == 200:
+            res_json = response.json()
+            return res_json['candidates'][0]['content']['parts'][0]['text']
+    except Exception:
+        pass
+    return None
 
 # ==============================================================================
 # PAGE CONFIGURATION & THEME STYLING
@@ -27,9 +75,97 @@ st.markdown("""
         color: #1B5E20 !important;
         font-weight: 800;
     }
-    /* Force high visibility of text/labels on the light background while preserving dark components */
-    p, span, label, li, caption, small {
+    
+    /* CRITICAL HIGH VISIBILITY CSS FOR ALL TEXT AND WIDGET LABELS */
+    .stApp p, .stApp span, .stApp label, .stApp li, .stApp caption, .stApp small {
+        color: #1E293B !important;
         font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+    
+    /* Target all possible widget labels */
+    div[data-testid="stWidgetLabel"] p,
+    div[data-testid="stWidgetLabel"] span,
+    div[data-testid="stWidgetLabel"] label,
+    div[data-testid="stWidgetLabel"] {
+        color: #1B5E20 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Target radio button text options */
+    div[role="radiogroup"] label, 
+    div[role="radiogroup"] p, 
+    div[role="radiogroup"] span,
+    div[role="radiogroup"] div {
+        color: #1E293B !important;
+        font-weight: 500 !important;
+    }
+
+    /* Target selectbox selected option and dropdown texts */
+    div[data-baseweb="select"] div,
+    div[data-baseweb="select"] span,
+    div[data-baseweb="select"] p {
+        color: #1E293B !important;
+    }
+
+    /* Target multi-select items */
+    div[data-baseweb="tag"] span {
+        color: #1E293B !important;
+    }
+
+    /* Target slider numbers, labels, and ticks */
+    div[data-testid="stSlider"] div,
+    div[data-testid="stSlider"] span,
+    div[data-testid="stSlider"] p {
+        color: #1B5E20 !important;
+    }
+
+    /* Target all markdown contents, headings and normal paragraphs */
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] span,
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] b,
+    [data-testid="stMarkdownContainer"] strong,
+    [data-testid="stMarkdownContainer"] label {
+        color: #1E293B !important;
+    }
+
+    /* Target file uploader drag/drop text and info */
+    [data-testid="stFileUploader"] section div,
+    [data-testid="stFileUploader"] p,
+    [data-testid="stFileUploader"] small {
+        color: #1E293B !important;
+    }
+
+    /* Target sidebar labels and texts */
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3,
+    [data-testid="stSidebar"] h4,
+    [data-testid="stSidebar"] div {
+        color: #1B5E20 !important;
+    }
+    
+    [data-testid="stSidebar"] div[role="radiogroup"] span,
+    [data-testid="stSidebar"] div[role="radiogroup"] label {
+        color: #1B5E20 !important;
+    }
+
+    /* Metric values and labels */
+    div[data-testid="stMetricValue"]>div {
+        color: #2E7D32 !important;
+    }
+    div[data-testid="stMetricLabel"]>div {
+        color: #1E293B !important;
+    }
+
+    /* Toggle labels */
+    [data-testid="stCheckbox"] label,
+    [data-testid="stCheckbox"] p,
+    [data-testid="stCheckbox"] span {
+        color: #1E293B !important;
     }
     
     /* Ensure the accented header card with dark green background maintains high-contrast white text */
@@ -179,16 +315,19 @@ ECO_TIPS = [
 tabs_options = [
     "🏠 Home Hub", 
     "🎯 Smart Recommendations", 
-    "🔍 Leaf & Soil Diagnostic", 
+    "🍃 Leaf Diagnosis", 
+    "🪨 Soil Diagnosis", 
+    "🌦 Outbreak Forecast", 
     "🤖 PrakritiMitra Chat", 
-    "📈 Water & Growth", 
+    "🚿 Water Precision", 
+    "📈 Growth Predictor", 
     "📚 Learning Hub",
     "🌍 Community Grid",
-    "🔄 Flow & Architecture",
+    "🔄 Flow & System Info",
     "👤 Profile & Auth"
 ]
 
-if "current_tab" not in st.session_state:
+if "current_tab" not in st.session_state or st.session_state.current_tab not in tabs_options:
     st.session_state.current_tab = "🏠 Home Hub"
 
 with st.sidebar:
@@ -366,16 +505,19 @@ if not st.session_state.auth_logged_in:
     </div>
     """, unsafe_allow_html=True)
     
-    nav_cols_locked = st.columns(9)
+    nav_cols_locked = st.columns(12)
     nav_icons_locked = {
         "🏠 Home Hub": "🏠 Home",
         "🎯 Smart Recommendations": "🎯 Recs",
-        "🔍 Leaf & Soil Diagnostic": "🔍 Scan",
+        "🍃 Leaf Diagnosis": "🍃 Leaf",
+        "🪨 Soil Diagnosis": "🪨 Soil",
+        "🌦 Outbreak Forecast": "🌦 Forecast",
         "🤖 PrakritiMitra Chat": "🤖 Chat",
-        "📈 Water & Growth": "📈 Growth",
+        "🚿 Water Precision": "🚿 Water",
+        "📈 Growth Predictor": "📈 Growth",
         "📚 Learning Hub": "📚 Learn",
         "🌍 Community Grid": "🌍 Social",
-        "🔄 Flow & Architecture": "🔄 Flow",
+        "🔄 Flow & System Info": "🔄 Flow",
         "👤 Profile & Auth": "👤 Profile"
     }
     
@@ -417,16 +559,19 @@ with col_aux:
 tabs_options = [
     "🏠 Home Hub", 
     "🎯 Smart Recommendations", 
-    "🔍 Leaf & Soil Diagnostic", 
+    "🍃 Leaf Diagnosis", 
+    "🪨 Soil Diagnosis", 
+    "🌦 Outbreak Forecast", 
     "🤖 PrakritiMitra Chat", 
-    "📈 Water & Growth", 
+    "🚿 Water Precision", 
+    "📈 Growth Predictor", 
     "📚 Learning Hub",
     "🌍 Community Grid",
-    "🔄 Flow & Architecture",
+    "🔄 Flow & System Info",
     "👤 Profile & Auth"
 ]
 
-if "current_tab" not in st.session_state:
+if "current_tab" not in st.session_state or st.session_state.current_tab not in tabs_options:
     st.session_state.current_tab = "🏠 Home Hub"
 
 active_tab = st.session_state.current_tab
@@ -456,7 +601,7 @@ if active_tab == "🏠 Home Hub":
             <span style="font-size:2.5rem;">📈</span>
             <h4 style="margin:0.5rem 0 0.2rem 0;">Smart Growth Predictions</h4>
             <p style="color:#64748B; font-size:0.85rem; margin-bottom:1rem;">Simulate plant development based on soil properties, moisture records, and solar history.</p>
-            <p style="font-size:0.85rem; color:#1B5E20; font-weight:bold;">👉 Navigate to 'Water & Growth' to simulate crops.</p>
+            <p style="font-size:0.85rem; color:#1B5E20; font-weight:bold;">👉 Navigate to 'Water Precision' or 'Growth Predictor' to simulate crops.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -466,7 +611,7 @@ if active_tab == "🏠 Home Hub":
             <span style="font-size:2.5rem;">🔍</span>
             <h4 style="margin:0.5rem 0 0.2rem 0;">AI Leaf Pathology Diagnostic</h4>
             <p style="color:#64748B; font-size:0.85rem; margin-bottom:1rem;">Upload photos of spotted, withered, or yellow leaves to parse infections using computer vision.</p>
-            <p style="font-size:0.85rem; color:#1B5E20; font-weight:bold;">👉 Go to 'Leaf & Soil Diagnostic' to check plant health.</p>
+            <p style="font-size:0.85rem; color:#1B5E20; font-weight:bold;">👉 Go to 'Leaf Diagnosis' or 'Soil Diagnosis' to check plant health.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -605,41 +750,30 @@ if active_tab == "🎯 Smart Recommendations":
                 st.write(f"Provide afternoon partial sun net filters and drip systems to prevent moisture evaporative shock on leaf structures.")
 
 # ==========================================
-# TAB 3: LEAF & SOIL DIAGNOSTIC
+# TAB 3: LEAF DIAGNOSIS
 # ==========================================
-if active_tab == "🔍 Leaf & Soil Diagnostic":
-    st.subheader("🔍 AI Leaf Disease Pathogen & Substrate Soil Decoder")
-    st.write("Assess leaf infections or decode chemical substrate textures. Multi-tiered computer vision modeling.")
+if active_tab == "🍃 Leaf Diagnosis":
+    st.subheader("🍃 AI Leaf Disease Pathogen Vision Decoder")
+    st.write("Assess leaf infections using multi-tiered computer vision modeling.")
     
     col_d1, col_d2 = st.columns([1.1, 1])
     
     with col_d1:
-        st.markdown("<div class='premium-card'>", unsafe_allow_html=True)
-        st.markdown("#### 🍃 Leaf Pathology Diagnostic")
-        st.write("Upload a direct top-down snapshot of an infected leaf to evaluate pathogens, bugs, or severe necrotic spots.")
-        
-        leaf_file = st.file_uploader("Upload Leaf Close-up Image", type=["jpg", "png", "jpeg"], key="master_leaf_upload")
-        st.markdown("<p style='text-align:center; color:#94A3B8;'>— OR —</p>", unsafe_allow_html=True)
-        demo_pick = st.selectbox("Inject Diagnostic Case Study Presets", [
-            "Manual Upload Mode",
-            "CASE 1: Wheat Stripe Rust (Puccinia striiformis)",
-            "CASE 2: Tomato Early Blight (Alternaria solani)",
-            "CASE 3: Dry Abiotic Citrus Solar Scorching",
-            "CASE 4: Tea Red Creeping Rust (Cephaleuros virescens)"
-        ])
-        
-        run_leaf = st.button("Run Leaf Vision Analysis")
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        st.markdown("<div class='premium-card'>", unsafe_allow_html=True)
-        st.markdown("#### 🪨 Substrate Soil Decipher")
-        st.write("Define chemical, color and physical attributes to generate organic potassium-phosphate enrichment recipes.")
-        soil_texture = st.select_slider("Texture Grains", ["Powdery Sand", "Loose Porous Loam", "Silt-Rich", "Dense Red Clay"])
-        soil_ph = st.slider("Estimated pH Level (Buffer Index)", 4.0, 9.5, 6.5, step=0.1)
-        organic_estimate = st.selectbox("Existing Raw Organic Humus Coverage", ["Scarce / Dry Ground", "Moderate / Standard Garden Soil", "Rich Fertile Mud"])
-        
-        run_soil = st.button("Decode Soil Substrate Profile")
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### 🍃 Leaf Pathology Diagnostic Input")
+            st.write("Upload a direct top-down snapshot of an infected leaf to evaluate pathogens, bugs, or severe necrotic spots.")
+            
+            leaf_file = st.file_uploader("Upload Leaf Close-up Image", type=["jpg", "png", "jpeg"], key="master_leaf_upload")
+            st.markdown("<p style='text-align:center; color:#94A3B8;'>— OR —</p>", unsafe_allow_html=True)
+            demo_pick = st.selectbox("Inject Diagnostic Case Study Presets", [
+                "Manual Upload Mode",
+                "CASE 1: Wheat Stripe Rust (Puccinia striiformis)",
+                "CASE 2: Tomato Early Blight (Alternaria solani)",
+                "CASE 3: Dry Abiotic Citrus Solar Scorching",
+                "CASE 4: Tea Red Creeping Rust (Cephaleuros virescens)"
+            ])
+            
+            run_leaf = st.button("Run Leaf Vision Analysis")
         
     with col_d2:
         if run_leaf or (demo_pick != "Manual Upload Mode" and "leaf_scanned" not in st.session_state):
@@ -647,78 +781,105 @@ if active_tab == "🔍 Leaf & Soil Diagnostic":
             with st.spinner("Processing pathobiology visual vectors via CNN networks..."):
                 time.sleep(1.2)
                 
-            st.markdown("<div class='premium-card' style='border: 1px solid #F87171; background-color: #FEF2F2;'>", unsafe_allow_html=True)
-            st.markdown("### 🧫 AI Leaf Diagnostic Report")
+            with st.container(border=True):
+                st.markdown("### 🧫 AI Leaf Diagnostic Report")
+                
+                if "CASE 1" in demo_pick or (leaf_file and "rust" in leaf_file.name.lower()):
+                    st.error("🚨 **Infection Detected: Stripe Rust (Puccinia striiformis)**")
+                    st.markdown("""
+                    - **Severity Index**: **HIGH** (Covers ~48% of active leaf canopy)
+                    - **Primary Etiology**: High damp condensation at nighttime combined with low wind flow.
+                    - **Organic Remediation Plan**:
+                      1. Actively prune infested bottom branches; package and incinerate them off-site.
+                      2. Mist localized cold-pressed neem oils combined with 0.5% soda water.
+                      3. Restructure layout spaces to decrease canopy damp density.
+                    """)
+                elif "CASE 2" in demo_pick or (leaf_file and "tomato" in leaf_file.name.lower()):
+                    st.warning("⚠️ **Infection Detected: Early Blight (Alternaria solani)**")
+                    st.markdown("""
+                    - **Severity Index**: **MODERATE** (Concentric circle brown spots)
+                    - **Primary Etiology**: Spores splashing up from raw top soil onto foliage during surface watering.
+                    - **Organic Remediation Plan**:
+                      1. Eliminate raw overhead sprinkler spraying; irrigate bottom roots via slow drippers.
+                      2. Mulch the bottom root soil bed with organic coconut coir fibers.
+                      3. Mist bio-fungicide containing *Bacillus subtilis* to slow spore production.
+                    """)
+                elif "CASE 3" in demo_pick:
+                    st.success("🟢 **Abiotic Stress Detected: Solar Scorching / Wind Shock**")
+                    st.markdown("""
+                    - **Severity Index**: **LOW** (Outer leaf margin dryness, no active pathogenic spread)
+                    - **Primary Etiology**: Dry thermal heat accompanied by excessive direct ultraviolet index.
+                    - **Organic Remediation Plan**:
+                      1. Erect a simple 30% partial-shade green nursery net.
+                      2. Avoid water drops dry-browning on foliage during hot midday heat.
+                      3. Prune highly desiccated tips.
+                    """)
+                else:
+                    st.error("🚨 **Infection Detected: Tea Red Creeping Rust (Cephaleuros virescens)**")
+                    st.markdown("""
+                    - **Severity Index**: **MODERATE** (Orange-brown felt-like velvet colonies)
+                    - **Primary Etiology**: Algal parasite multiplying on moisture-saturated hosts in humid, shaded environments.
+                    - **Organic Remediation Plan**:
+                      1. Prune highly nested lower air corridors to accelerate daytime sun drying.
+                      2. Utilise copper-based organic dusts early in the seasonal cycle.
+                    """)
+
+# ==========================================
+# TAB 3.1: SOIL DIAGNOSIS
+# ==========================================
+if active_tab == "🪨 Soil Diagnosis":
+    st.subheader("🪨 Chemical Substrate & Soil Texture Decoder")
+    st.write("Define chemical, color and physical attributes to generate organic potassium-phosphate enrichment recipes.")
+    
+    col_d1, col_d2 = st.columns([1.1, 1])
+    
+    with col_d1:
+        with st.container(border=True):
+            st.markdown("#### 🪨 Soil Parameter Inputs")
+            soil_texture = st.select_slider("Texture Grains", ["Powdery Sand", "Loose Porous Loam", "Silt-Rich", "Dense Red Clay"])
+            soil_ph = st.slider("Estimated pH Level (Buffer Index)", 4.0, 9.5, 6.5, step=0.1)
+            organic_estimate = st.selectbox("Existing Raw Organic Humus Coverage", ["Scarce / Dry Ground", "Moderate / Standard Garden Soil", "Rich Fertile Mud"])
             
-            if "CASE 1" in demo_pick or (leaf_file and "rust" in leaf_file.name.lower()):
-                st.error("🚨 **Infection Detected: Stripe Rust (Puccinia striiformis)**")
-                st.markdown("""
-                - **Severity Index**: **HIGH** (Covers ~48% of active leaf canopy)
-                - **Primary Etiology**: High damp condensation at nighttime combined with low wind flow.
-                - **Organic Remediation Plan**:
-                  1. Actively prune infested bottom branches; package and incinerate them off-site.
-                  2. Mist localized cold-pressed neem oils combined with 0.5% soda water.
-                  3. Restructure layout spaces to decrease canopy damp density.
-                """)
-            elif "CASE 2" in demo_pick or (leaf_file and "tomato" in leaf_file.name.lower()):
-                st.warning("⚠️ **Infection Detected: Early Blight (Alternaria solani)**")
-                st.markdown("""
-                - **Severity Index**: **MODERATE** (Target-like concentric circle brown spots spotted)
-                - **Primary Etiology**: Spores splashing up from raw top soil onto foliage during heavy surface watering.
-                - **Organic Remediation Plan**:
-                  1. Eliminate raw overhead sprinkler spraying; irrigate bottom roots via slow drippers.
-                  2. Mulch the bottom root soil bed with organic coconut coir fibers.
-                  3. Mist bio-fungicide containing *Bacillus subtilis* to slow spore production.
-                """)
-            elif "CASE 3" in demo_pick:
-                st.success("🟢 **Abiotic Stress Detected: Solar Scorching / Wind Shock**")
-                st.markdown("""
-                - **Severity Index**: **LOW** (Outer leaf margin dryness, no active pathogenic spread)
-                - **Primary Etiology**: Dry thermal heat accompanied by excessive direct ultraviolet index.
-                - **Organic Remediation Plan**:
-                  1. Erect a simple 30% partial-shade green nursery net.
-                  2. Avoid water drops dry-browning on foliage during hot midday heat.
-                """)
-            else:
-                st.error("🚨 **Infection Detected: Tea Red Creeping Rust (Cephaleuros virescens)**")
-                st.markdown("""
-                - **Severity Index**: **MODERATE** (Orange-brown felt-like velvet colonies)
-                - **Primary Etiology**: Algal parasite multiplying on moisture-saturated hosts in humid, shaded environments.
-                - **Organic Remediation Plan**:
-                  1. Prune highly nested lower air corridors to accelerate daytime sun drying.
-                  2. Utilize copper-based organic dusts early in the seasonal cycle.
-                """)
-            st.markdown("</div>", unsafe_allow_html=True)
+            run_soil = st.button("Decode Soil Substrate Profile")
             
+    with col_d2:
         if run_soil:
             with st.spinner("Decoding substrate components..."):
                 time.sleep(0.8)
-            st.markdown("<div class='premium-card' style='border: 1px solid #34D399; background-color: #ECFDF5;'>", unsafe_allow_html=True)
-            st.markdown("### 🪨 Soil Analysis & Nutrient Output")
-            st.markdown(f"""
-            - **Analyzed Substrate Class**: **{soil_texture}** with {organic_estimate} base
-            - **Buffered pH Assessment**: **{soil_ph}** ({"Acidic" if soil_ph < 6 else "Alkaline" if soil_ph > 7.2 else "Optimal Neutral"})
-            - **Recommended Organic Fertilizers**:
-              1. Add aged kitchen compost and cow manure to bulk organic carbon.
-              2. Add ground eggshells (calcium boost) or wood ashes to adjust base parameters if acidic.
-              3. Dilute rock phosphate powder inside potting mixes to promote resilient root webs.
-            """)
-            st.markdown("</div>", unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown("### 🪨 Soil Analysis & Nutrient Output")
+                st.markdown(f"""
+                - **Analyzed Substrate Class**: **{soil_texture}** with {organic_estimate} base
+                - **Buffered pH Assessment**: **{soil_ph}** ({"Acidic" if soil_ph < 6 else "Alkaline" if soil_ph > 7.2 else "Optimal Neutral"})
+                - **Recommended Organic Fertilizers**:
+                  1. Add aged kitchen compost and cow manure to bulk organic carbon.
+                  2. Add ground eggshells (calcium boost) or wood ashes to adjust base parameters if acidic.
+                  3. Dilute rock phosphate powder inside potting mixes to promote resilient root webs.
+                """)
 
-    # AI Weather-Disease Prediction model
-    st.markdown("### 🌦 Weather-Driven Interactive Disease Prediction Risk")
+# ==========================================
+# TAB 3.2: OUTBREAK FORECAST
+# ==========================================
+if active_tab == "🌦 Outbreak Forecast":
+    st.subheader("🌦 Weather-Driven Outbreak Infection Forecaster")
     st.write("Configure environmental triggers to forecast upcoming fungal or bacterial disease risks prior to outbreaks.")
     
-    p_spec = st.selectbox("Subject Plant Crop", ["Solanaceous (Tomato, Pepper, Eggplant)", "Cereal grain crops", "Succulent Herbs"])
-    p_wet_hrs = st.slider("Continuous Foliar Wetness (Hours daily)", 0, 24, 6)
-    p_heat = st.slider("Expected Humidity Index (%)", 10, 100, 65)
-    
-    if st.button("Generate Disease Outbreak Risk Map"):
+    with st.container(border=True):
+        st.markdown("#### 🔬 Disease Risk Simulation parameters")
+        p_spec = st.selectbox("Subject Plant Crop", ["Solanaceous (Tomato, Pepper, Eggplant)", "Cereal grain crops", "Succulent Herbs"])
+        p_wet_hrs = st.slider("Continuous Foliar Wetness (Hours daily)", 0, 24, 6)
+        p_heat = st.slider("Expected Humidity Index (%)", 10, 100, 65)
+        
+        run_forecast = st.button("Generate Disease Outbreak Risk Map")
+        
+    if run_forecast:
         risk = (p_wet_hrs * 3.5) + (p_heat * 0.5)
         risk = min(max(round(risk, 0), 0), 100)
         
+        st.markdown("---")
+        st.markdown("#### 📊 Simulation Diagnostic Prediction Output")
         if risk < 35:
-            st.success(f"🟢 Outbreak Risk Level: {risk}% (Low). Foliar tissues are adequately dry.")
+            st.success(f"🟢 Outbreak Risk Level: {risk}% (Low). Foliar tissues are adequately dry. High-yield window stable.")
         elif risk < 70:
             st.warning(f"🟡 Outbreak Risk Level: {risk}% (Moderate). Monitor lower stems for micro-fungal rings.")
         else:
@@ -727,33 +888,40 @@ if active_tab == "🔍 Leaf & Soil Diagnostic":
 # ==========================================
 # TAB 4: PRAKRITIMITRA COMPANION CHAT
 # ==========================================
+# ==========================================
+# TAB 4: PRAKRITIMITRA COMPANION CHAT
+# ==========================================
 if active_tab == "🤖 PrakritiMitra Chat":
     st.markdown("""
     <div style="background-color:#E8F5E9; padding:1.25rem; border-radius:18px; border:1px solid #C8E6C9; margin-bottom:1rem;">
-        <h3 style="color:#2E7D32; margin:0 0 0.25rem 0;">🤖 PrakritiMitra Chat Screen</h3>
-        <p style="margin:0; font-size:0.95rem; color:#1B5E20;">A sophisticated botanical companion capable of advising on organic farming, crop rotation, regional conservation, or general daily learning topics.</p>
+        <h3 style="color:#2E7D32; margin:0 0 0.25rem 0;">🤖 PrakritiMitra General AI Assistant</h3>
+        <p style="margin:0; font-size:0.95rem; color:#1B5E20;">A sophisticated botanical companion and general assistant with native AI integration. Ask PrakritiMitra anything — from botany to history, essays, programming, or coding!</p>
     </div>
     """, unsafe_allow_html=True)
     
-    col_chat1, col_chat2 = st.columns([1, 2.8])
+    col_chat1, col_chat2 = st.columns([1, 2.5])
     with col_chat1:
-        st.markdown("<div class='premium-card'>", unsafe_allow_html=True)
-        st.markdown("#### ⚙️ Companion Modes")
-        chat_mode = st.radio("Intelligence Personality Profile", [
-            "🌿 Specialized Botanist (Focuses purely on botany, disease indexes, gardening workflows, soil dynamics)",
-            "🧠 General AI Assistant (Capable of helping with broad study questions, study planning, everyday essays)"
-        ])
-        
-        st.markdown("#### 🌍 Multilingual Intelligence")
-        selected_lang = st.selectbox("Preferred Conversation Language", [
-            "English", "Hindi (हिन्दी)", "Telugu (తెలుగు)", "Tamil (தமிழ்)", 
-            "Kannada (ಕನ್ನಡ)", "Malayalam (മലയാളം)", "Bengali (বাংলা)", "Spanish (Español)"
-        ])
-        
-        st.markdown("#### 🎙 Speech & Voice Controls")
-        voice_tts = st.toggle("Enable TTS (Text-to-Speech) Audio Synthesizer Output", value=True)
-        use_mic = st.toggle("Simulate Speech-to-Text Voice Microphone Input", value=False)
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### ⚙️ Companion Modes")
+            chat_mode = st.radio("Intelligence Personality Profile", [
+                "🌿 Specialized Botanist",
+                "🧠 General AI Assistant"
+            ])
+            
+            if chat_mode == "🌿 Specialized Botanist":
+                st.info("Uses deep contextual botanical models to assist with gardening, soil health, crop rotation, and pests.")
+            else:
+                st.info("Functions as a robust general chatbot capable of addressing all topics, schoolwork, creative writing, or general chats.")
+            
+            st.markdown("#### 🌍 Multilingual Intelligence")
+            selected_lang = st.selectbox("Preferred Conversation Language", [
+                "English", "Hindi (हिन्दी)", "Telugu (తెలుగు)", "Tamil (தமிழ்)", 
+                "Kannada (ಕನ್ನಡ)", "Malayalam (മലയാളം)", "Bengali (বাংলা)", "Spanish (Español)"
+            ])
+            
+            st.markdown("#### 🎙 Speech & voice Controls")
+            voice_tts = st.toggle("Enable TTS (Text-to-Speech) Audio Synthesizer Output", value=True)
+            use_mic = st.toggle("Simulate Speech-to-Text Voice Microphone Input", value=False)
         
     with col_chat2:
         # Chat log display
@@ -769,7 +937,7 @@ if active_tab == "🤖 PrakritiMitra Chat":
                 "How do I naturally treatment fungal leaves?",
                 "Suggest a companion plant layout for balconies.",
                 "How long does organic compost take to decompose?",
-                "What is the difference between monocot and dicot leaves?"
+                "Tell me a story about a sacred banyan tree."
             ])
             if st.button("Synthesize Speech Input 🎤"):
                 st.session_state.chat_history.append({"role": "user", "content": simulated_speech})
@@ -786,73 +954,63 @@ if active_tab == "🤖 PrakritiMitra Chat":
             user_prompt = st.session_state.chat_history[-1]["content"]
             
             with st.chat_message("assistant", avatar="🤖"):
-                with st.spinner("Formulating biological suggestions..."):
-                    time.sleep(1.0)
-                
-                low_p = user_prompt.lower()
-                
-                # Dynamic localized response matching selected language
-                if "hindi" in selected_lang.lower():
-                    base_resp = "नमस्ते! "
-                elif "telugu" in selected_lang.lower():
-                    base_resp = "నమస్కారం! "
-                elif "tamil" in selected_lang.lower():
-                    base_resp = "வணக்கம்! "
-                else:
-                    base_resp = "Greetings! "
+                with st.spinner("Formulating intelligent response via PrakritiMitra AI..."):
+                    ai_response = call_gemini_api(user_prompt, chat_mode, selected_lang)
                     
-                if "yellow" in low_p or "fungal" in low_p or "leaves" in low_p:
-                    ans = base_resp + "Yellow leaf tips (chlorosis) normally signal either root saturation or early stage nitrogen mineral flushouts. Check the soil moisture first. If it's soggy, halt watering for 3 days and spray low level organic compost tea."
-                elif "companion" in low_p:
-                    ans = base_resp + "A marvelous layout idea: Plant basil right next to tomato shrubs. It naturally blocks whiteflies. For vertical pots, plant deep carrot sprouts nested alongside garlic heads."
-                elif "compost" in low_p:
-                    ans = base_resp + "Standard organic composting under aerobic conditions takes roughly 4 to 12 weeks to completely disintegrate into black gold. Turn the composting piles every 10 days to support oxygen ingestion by friendly micro-bacteria!"
-                elif "monocot" in low_p or "difference" in low_p:
-                    ans = base_resp + "Fascinating science question! Monocots typically features leaves with parallel vein grids (like wheat or palms), whereas dicots display sophisticated web-like branching veins (like rose bushes or oaks)."
-                else:
-                    ans = base_resp + "Fascinating query! I suggest checking our microclimate suitability checklist to inspect matches, or review the Eco Encyclopedia for detailed biological data steps."
-                
-                st.session_state.chat_history.append({"role": "assistant", "content": ans})
-                st.write(ans)
-                
-                # Audio simulator if TTS toggled
-                if voice_tts:
-                    st.write("🔊 *Synthetic Speech Audio Stream Output:*")
-                    # Inject a clean simulated sound bar
-                    audio_data = np.sin(np.linspace(0, 3000, 3000))
-                    st.audio(audio_data, format="audio/wav", sample_rate=16000)
+                    if ai_response:
+                        ans = ai_response
+                    else:
+                        time.sleep(1.0)
+                        low_p = user_prompt.lower()
+                        # Dynamic localized response matching selected language
+                        if "hindi" in selected_lang.lower():
+                            base_resp = "नमस्ते! "
+                        elif "telugu" in selected_lang.lower():
+                            base_resp = "నమస్కారం! "
+                        elif "tamil" in selected_lang.lower():
+                            base_resp = "வணக்கம்! "
+                        else:
+                            base_resp = "Greetings! "
+                            
+                        if "yellow" in low_p or "fungal" in low_p or "leaves" in low_p:
+                            ans = base_resp + "Yellow leaf tips (chlorosis) normally signal either root saturation or early stage nitrogen mineral flushouts. Check the soil moisture first. If it's soggy, halt watering for 3 days and spray low level organic compost tea."
+                        elif "companion" in low_p:
+                            ans = base_resp + "A marvelous layout idea: Plant basil right next to tomato shrubs. It naturally blocks whiteflies. For vertical pots, plant deep carrot sprouts nested alongside garlic heads."
+                        elif "compost" in low_p:
+                            ans = base_resp + "Standard organic composting under aerobic conditions takes roughly 4 to 12 weeks to completely disintegrate into black gold. Turn the composting piles every 10 days to support oxygen ingestion by friendly micro-bacteria!"
+                        elif "monocot" in low_p or "difference" in low_p:
+                            ans = base_resp + "Fascinating science question! Monocots typically features leaves with parallel vein grids (like wheat or palms), whereas dicots display sophisticated web-like branching veins (like rose bushes or oaks)."
+                        else:
+                            ans = base_resp + f"Your question: '{user_prompt}' is wonderful. I recommend checking our gardening databases and microclimate checklists to learn more!"
+                    
+                    st.session_state.chat_history.append({"role": "assistant", "content": ans})
+                    st.write(ans)
+                    
+                    # Audio simulator if TTS toggled
+                    if voice_tts:
+                        st.write("🔊 *Synthetic Speech Audio Stream Output:*")
+                        audio_data = np.sin(np.linspace(0, 3000, 3000))
+                        st.audio(audio_data, format="audio/wav", sample_rate=16000)
 
 # ==========================================
-# TAB 5: WATER & GROWTH
+# TAB 5: WATER PRECISION
 # ==========================================
-if active_tab == "📈 Water & Growth":
-    st.subheader("💧 Smart Irrigation & Growth Simulation Modeler")
-    st.write("Calculate precision water needs or forecast crop growth height, yield, and blossom calendars with custom telemetry inputs.")
+if active_tab == "🚿 Water Precision":
+    st.subheader("🚿 Precision Water Management Calculator")
+    st.write("Calculates daily water volumes by matching localized evapotranspiration coefficients.")
     
     col_w1, col_w2 = st.columns([1, 1.2])
     
     with col_w1:
-        st.markdown("<div class='premium-card'>", unsafe_allow_html=True)
-        st.markdown("#### 🚿 Precision Water Management Calculator")
-        st.write("Calculates daily water volumes by matching localized evapotranspiration coefficients.")
-        
-        target_crop = st.selectbox("Plant Name Category", ["Holy Basil (Tulsi)", "Cherry Tomato", "Spotted Aloe Vera", "Carrot Roots", "French Marigold"])
-        stage = st.selectbox("Present Growth Phase", ["Sprouting/Germination Seedling", "Rapid Vegetative Shrub", "Flowering Stage", "Fruit Maturity"])
-        soil_moisture_level = st.slider("Soil Moisture Content (Telemetry Percent)", 10, 100, 45)
-        evapo_index = st.slider("Day Ambient Heat Loss Coefficient (ET0)", 1.0, 12.0, 4.5, step=0.1)
-        
-        btn_calc_water = st.button("Calculate Water Irrigation Command")
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        st.markdown("<div class='premium-card'>", unsafe_allow_html=True)
-        st.markdown("#### 📊 Smart Growth Trend Predictor")
-        st.write("Tune fertilizer and soil configurations to project growth rates.")
-        fert_dose = st.select_slider("Aged Bio-Compost Dosage", ["None", "Low / Maintenance", "Standard Balanced", "Highly Fertilized Booster"])
-        soil_aeration = st.slider("Soil Pot Aeration Rating (%)", 10, 100, 75)
-        
-        btn_sim_growth = st.button("Run Future Growth Simulation")
-        st.markdown("</div>", unsafe_allow_html=True)
-        
+        with st.container(border=True):
+            st.markdown("#### 🚿 Telemetry Inputs")
+            target_crop = st.selectbox("Plant Name Category", ["Holy Basil (Tulsi)", "Cherry Tomato", "Spotted Aloe Vera", "Carrot Roots", "French Marigold"])
+            stage = st.selectbox("Present Growth Phase", ["Sprouting/Germination Seedling", "Rapid Vegetative Shrub", "Flowering Stage", "Fruit Maturity"])
+            soil_moisture_level = st.slider("Soil Moisture Content (Telemetry Percent)", 10, 100, 45)
+            evapo_index = st.slider("Day Ambient Heat Loss Coefficient (ET0)", 1.0, 12.0, 4.5, step=0.1)
+            
+            btn_calc_water = st.button("Calculate Water Irrigation Command")
+            
     with col_w2:
         if btn_calc_water or "water_calc_ready" not in st.session_state:
             st.session_state.water_calc_ready = True
@@ -865,31 +1023,53 @@ if active_tab == "📈 Water & Growth":
             water_req = (evapo_index * kc) * (1 - (soil_moisture_level / 150))
             water_req_l = max(round(water_req * 0.25, 2), 0.05)
             
-            st.markdown("<div class='premium-card' style='border: 1px solid #60A5FA; background-color: #EFF6FF;'>", unsafe_allow_html=True)
-            st.markdown("### 💧 Irrigation Report")
-            st.markdown(f"""
-            - **Target crop species**: *{target_crop}* ({stage})
-            - **Evaluated Water Requirement**: **{water_req_l} Liters** per container/pot daily.
-            - **Irrigation Schedule Advice**: Watering interval optimal calculated early in morning hours to trim evaporation losses.
-            - **Conservation Recommendation**: Install coconut mulch coir to reduce current water requirements by another `20%`!
-            """)
-            st.markdown("</div>", unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown("### 💧 Irrigation Report")
+                st.markdown(f"""
+                - **Target crop species**: *{target_crop}* ({stage})
+                - **Evaluated Water Requirement**: **{water_req_l} Liters** per container/pot daily.
+                - **Irrigation Schedule Advice**: Watering interval optimal calculated early in morning hours to trim evaporation losses.
+                - **Conservation Recommendation**: Install coconut mulch coir to reduce current water requirements by another `20%`!
+                """)
+
+# ==========================================
+# TAB 5.1: GROWTH PREDICTOR
+# ==========================================
+if active_tab == "📈 Growth Predictor":
+    st.subheader("📈 Smart Growth Trend Predictor")
+    st.write("Tune fertilizer and soil configurations to project growth rates.")
+    
+    col_w1, col_w2 = st.columns([1, 1.2])
+    
+    with col_w1:
+        with st.container(border=True):
+            st.markdown("#### 🌱 Crop Simulation parameters")
+            fert_dose = st.select_slider("Aged Bio-Compost Dosage", ["None", "Low / Maintenance", "Standard Balanced", "Highly Fertilized Booster"])
+            soil_aeration = st.slider("Soil Pot Aeration Rating (%)", 10, 100, 75)
             
-        if btn_sim_growth:
-            st.markdown("<div class='premium-card'>", unsafe_allow_html=True)
-            st.markdown("### 📈 Projected Height Development Simulator")
-            st.write("Visualizes plant height projections over a 12-week timeline.")
+            btn_sim_growth = st.button("Run Future Growth Simulation")
             
-            # Generate simulation growth data
-            weeks = [f"Wk {w}" for w in range(1, 13)]
-            base_coeff = 2.5 if fert_dose == "None" else 4.0 if fert_dose == "Low / Maintenance" else 6.2 if fert_dose == "Standard Balanced" else 8.5
-            heights = [round(base_coeff * (w**0.8) * (soil_aeration/100), 1) for w in range(1, 13)]
-            
-            chart_df = pd.DataFrame({"Weeks": weeks, "Expected Plant Height (cm)": heights})
-            st.line_chart(chart_df.set_index("Weeks"))
-            
-            st.write(f"🌟 **Simulation Outcomes:** With *{fert_dose}* composting, your crop will reach approximately **{heights[-1]} cm** at week 12. Expected blossom buds will start surfacing around week 7–8.")
-            st.markdown("</div>", unsafe_allow_html=True)
+    with col_w2:
+        if btn_sim_growth or "growth_sim_seeded" not in st.session_state:
+            st.session_state.growth_sim_seeded = True
+            if "fert_dose" not in locals():
+                fert_dose = "Standard Balanced"
+            if "soil_aeration" not in locals():
+                soil_aeration = 75
+                
+            with st.container(border=True):
+                st.markdown("### 📈 Projected Height Development Simulator")
+                st.write("Visualizes plant height projections over a 12-week timeline.")
+                
+                # Generate simulation growth data
+                weeks = [f"Wk {w}" for w in range(1, 13)]
+                base_coeff = 2.5 if fert_dose == "None" else 4.0 if fert_dose == "Low / Maintenance" else 6.2 if fert_dose == "Standard Balanced" else 8.5
+                heights = [round(base_coeff * (w**0.8) * (soil_aeration/100), 1) for w in range(1, 13)]
+                
+                chart_df = pd.DataFrame({"Weeks": weeks, "Expected Plant Height (cm)": heights})
+                st.line_chart(chart_df.set_index("Weeks"))
+                
+                st.write(f"🌟 **Simulation Outcomes:** With *{fert_dose}* composting, your crop will reach approximately **{heights[-1]} cm** at week 12. Expected blossom buds will start surfacing around week 7–8.")
 
 # ==========================================
 # TAB 6: ECO LEARNING HUB
@@ -1002,7 +1182,7 @@ if active_tab == "🌍 Community Grid":
 # ==========================================
 # TAB 7.5: WORKFLOW & DEEP ARCHITECTURE FLOW
 # ==========================================
-if active_tab == "🔄 Flow & Architecture":
+if active_tab == "🔄 Flow & System Info":
     st.subheader("🔄 Interactive System Architecture & Application Workflows")
     st.write("Examine the visual pathways, backend pipelines, predictive AI models, and real-time state machines powering the EcoFriend engine.")
     
@@ -1289,16 +1469,19 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-nav_cols = st.columns(9)
+nav_cols = st.columns(12)
 nav_icons = {
     "🏠 Home Hub": "🏠 Home",
     "🎯 Smart Recommendations": "🎯 Recs",
-    "🔍 Leaf & Soil Diagnostic": "🔍 Scan",
+    "🍃 Leaf Diagnosis": "🍃 Leaf",
+    "🪨 Soil Diagnosis": "🪨 Soil",
+    "🌦 Outbreak Forecast": "🌦 Forecast",
     "🤖 PrakritiMitra Chat": "🤖 Chat",
-    "📈 Water & Growth": "📈 Growth",
+    "🚿 Water Precision": "🚿 Water",
+    "📈 Growth Predictor": "📈 Growth",
     "📚 Learning Hub": "📚 Learn",
     "🌍 Community Grid": "🌍 Social",
-    "🔄 Flow & Architecture": "🔄 Flow",
+    "🔄 Flow & System Info": "🔄 Flow",
     "👤 Profile & Auth": "👤 Profile"
 }
 
