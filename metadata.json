@@ -1,0 +1,6 @@
+{
+  "name": "EcoFriend",
+  "description": "AI Smart Plantation Assistant – growing a greener future with smart recommendations, plant leaf disease detection, soil analysis, and the PrakritiMitra AI companion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

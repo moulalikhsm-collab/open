@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Main outer leaf body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,81C54,81 22,54 22,34C22,18 38,15 48,24C52,14 68,10 81,24C94,38 88,57 54,81Z" />
+    <!-- Golden organic center sprout details -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M54,81C54,81 53,44 71,28C73,26 76,28 75,31C63,50 54,81 54,81Z" />
+    <path
+        android:fillColor="#81C784"
+        android:pathData="M54,81C54,81 55,48 37,34C35,32 32,34 33,37C45,55 54,81 54,81Z" />
+</vector>
